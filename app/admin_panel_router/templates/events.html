@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="ru">
+  <!--begin::Head-->
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>AdminLTE v4 | Dashboard</title>
+    <!--begin::Accessibility Meta Tags-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+    <!--end::Accessibility Meta Tags-->
+    <!--begin::Primary Meta Tags-->
+    <meta name="title" content="AdminLTE v4 | Dashboard" />
+    <meta name="author" content="ColorlibHQ" />
+    <meta
+      name="description"
+      content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS. Fully accessible with WCAG 2.1 AA compliance."
+    />
+    <meta
+      name="keywords"
+      content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, colorlibhq, colorlibhq dashboard, colorlibhq admin dashboard, accessible admin panel, WCAG compliant"
+    />
+    <!--end::Primary Meta Tags-->
+    <!--begin::Accessibility Features-->
+    <!-- Skip links will be dynamically added by accessibility.js -->
+    <meta name="supported-color-schemes" content="light dark" />
+    <link rel="preload" href="{{ url_for('static', path='css/adminlte.css') }}" as="style" />
+    <!--end::Accessibility Features-->
+    <!--begin::Fonts-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+      integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q="
+      crossorigin="anonymous"
+      media="print"
+      onload="this.media='all'"
+    />
+    <!--end::Fonts-->
+    <!--begin::Third Party Plugin(OverlayScrollbars)-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"
+      crossorigin="anonymous"
+    />
+    <!--end::Third Party Plugin(OverlayScrollbars)-->
+    <!--begin::Third Party Plugin(Bootstrap Icons)-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+      crossorigin="anonymous"
+    />
+    <!--end::Third Party Plugin(Bootstrap Icons)-->
+    <!--begin::Required Plugin(AdminLTE)-->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/adminlte.css') }}" />
+    <!--end::Required Plugin(AdminLTE)-->
+    <!-- apexcharts -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
+      integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0="
+      crossorigin="anonymous"
+    />
+    <!-- jsvectormap -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css"
+      integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4="
+      crossorigin="anonymous"
+    />
+  </head>
+  <!--end::Head-->
+  <!--begin::Body-->
+  <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+    <!--begin::App Wrapper-->
+    <div class="app-wrapper">
+      <!--begin::Header-->
+      <nav class="app-header navbar navbar-expand bg-body">
+        <!--begin::Container-->
+        <div class="container-fluid">
+          <!--begin::Start Navbar Links-->
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                <i class="bi bi-list"></i>
+              </a>
+            </li>
+          </ul>
+          <!--end::Start Navbar Links-->
+          <!--begin::End Navbar Links-->
+          <ul class="navbar-nav ms-auto">
+            <!--begin::Notifications Dropdown Menu-->
+            <li class="nav-item dropdown">
+              <a class="nav-link" data-bs-toggle="dropdown" href="#">
+                <i class="bi bi-bell-fill"></i>
+                <span class="navbar-badge badge text-bg-warning">15</span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                <span class="dropdown-item dropdown-header">15 Notifications</span>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item">
+                  <i class="bi bi-envelope me-2"></i> 4 new messages
+                  <span class="float-end text-secondary fs-7">3 mins</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item">
+                  <i class="bi bi-people-fill me-2"></i> 8 friend requests
+                  <span class="float-end text-secondary fs-7">12 hours</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item">
+                  <i class="bi bi-file-earmark-fill me-2"></i> 3 new reports
+                  <span class="float-end text-secondary fs-7">2 days</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item dropdown-footer"> See All Notifications </a>
+              </div>
+            </li>
+            <!--end::Notifications Dropdown Menu-->
+            <!--begin::Fullscreen Toggle-->
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-lte-toggle="fullscreen">
+                <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
+                <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
+              </a>
+            </li>
+            <!--end::Fullscreen Toggle-->
+            <!--begin::User Menu Dropdown-->
+            <li class="nav-item dropdown user-menu">
+              <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle"></i>
+                <span class="d-none d-md-inline">Alexander Pierce</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                <!--begin::User Image-->
+                <li class="user-header text-bg-primary">
+                  <i class="bi bi-person-circle"></i>
+                  <p>
+                    Alexander Pierce - Web Developer
+                    <small>Member since Nov. 2023</small>
+                  </p>
+                </li>
+                <!--end::User Image-->
+                <!--begin::Menu Body-->
+                <li class="user-body">
+                  <!--begin::Row-->
+                  <div class="row">
+                    <div class="col-4 text-center"><a href="#">Followers</a></div>
+                    <div class="col-4 text-center"><a href="#">Sales</a></div>
+                    <div class="col-4 text-center"><a href="#">Friends</a></div>
+                  </div>
+                  <!--end::Row-->
+                </li>
+                <!--end::Menu Body-->
+                <!--begin::Menu Footer-->
+                <li class="user-footer">
+                  <a href="#" class="btn btn-default btn-flat">Profile</a>
+                  <a href="#" class="btn btn-default btn-flat float-end">Sign out</a>
+                </li>
+                <!--end::Menu Footer-->
+              </ul>
+            </li>
+            <!--end::User Menu Dropdown-->
+          </ul>
+          <!--end::End Navbar Links-->
+        </div>
+        <!--end::Container-->
+      </nav>
+      <!--end::Header-->
+      <!--begin::Sidebar-->
+      <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+        <!--begin::Sidebar Brand-->
+        <div class="sidebar-brand">
+          <!--begin::Brand Link-->
+          <a href="./index.html" class="brand-link">
+            <!--begin::Brand Text-->
+            <span class="brand-text fw-light">Admin Panel</span>
+            <!--end::Brand Text-->
+          </a>
+          <!--end::Brand Link-->
+        </div>
+        <!--end::Sidebar Brand-->
+        <!--begin::Sidebar Wrapper-->
+        <div class="sidebar-wrapper">
+          <nav class="mt-2">
+            <!--begin::Sidebar Menu-->
+            <ul
+              class="nav sidebar-menu flex-column"
+              data-lte-toggle="treeview"
+              role="navigation"
+              aria-label="Main navigation"
+              data-accordion="false"
+              id="navigation"
+            >
+              <li class="nav-item">
+                <a href="/admin/" class="nav-link">
+                  <i class="nav-icon bi bi-bar-chart"></i>
+                  <p>Дашборд</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/events" class="nav-link active">
+                  <i class="nav-icon bi bi-calendar2-date"></i>
+                  <p>Мероприятия</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/registrations" class="nav-link">
+                  <i class="nav-icon bi bi-person-plus"></i>
+                  <p>Регистрации</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/exhibition_applies" class="nav-link">
+                  <i class="nav-icon bi bi-journal-bookmark-fill"></i>
+                  <p>Заявки выcтавки</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/partner_applies" class="nav-link">
+                  <i class="nav-icon bi bi-journal-medical"></i>
+                  <p>Заявки партнеры</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/users" class="nav-link">
+                  <i class="nav-icon bi bi-people"></i>
+                  <p>Пользователи</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/queue" class="nav-link">
+                  <i class="nav-icon bi bi-hourglass-split"></i>
+                  <p>Очередь</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/payments" class="nav-link">
+                  <i class="nav-icon bi bi-cash-coin"></i>
+                  <p>Платежи</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/documents" class="nav-link">
+                  <i class="nav-icon bi bi-file-earmark-richtext"></i>
+                  <p>Документы</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/feedback" class="nav-link">
+                  <i class="nav-icon bi bi-chat-heart"></i>
+                  <p>Отзывы</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/noftications" class="nav-link">
+                  <i class="nav-icon bi bi-bell"></i>
+                  <p>Уведомление</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/communication" class="nav-link">
+                  <i class="nav-icon bi bi-telephone-inbound-fill"></i>
+                  <p>Связь с клиентами</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/qr" class="nav-link">
+                  <i class="nav-icon bi bi-qr-code"></i>
+                  <p>QR-коды</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/black_list" class="nav-link">
+                  <i class="nav-icon bi bi-person-fill-x"></i>
+                  <p>Чёрный список</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/settings" class="nav-link ">
+                  <i class="nav-icon bi-gear"></i>
+                  <p>Настройки</p>
+                </a>
+              </li>
+            </ul>
+            <!--end::Sidebar Menu-->
+          </nav>
+        </div>
+        <!--end::Sidebar Wrapper-->
+      </aside>
+      <!--end::Sidebar-->
+      <!--begin::App Main-->
+      <main class="app-main">
+        <!--begin::App Content Header-->
+        <div class="app-content-header">
+          <!--begin::Container-->
+          <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row">
+              <div class="col-sm-6"><h3 class="mb-0">Мероприятия</h3></div>
+            </div>
+            <!--end::Row-->
+          </div>
+          <!--end::Container-->
+        </div>
+        <!--end::App Content Header-->
+        <!--begin::App Content-->
+        <div class="app-content">
+          <!--begin::Container-->
+          <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                      <h3 class="card-title mb-0">Ближайшие мероприятия</h3>
+                      <div class="d-flex flex-wrap align-items-center gap-2">
+                        <!-- Поиск по названию -->
+                        <div class="input-group input-group-sm" style="width: 200px;">
+                          <input type="text" class="form-control" placeholder="Поиск по названию...">
+                          <button class="btn btn-outline-secondary" type="button">
+                            <i class="bi bi-search"></i>
+                          </button>
+                        </div>
+                        
+                        <!-- Фильтр по дате -->
+                        <select class="form-select form-select-sm" style="width: 130px;">
+                          <option value="">Все даты</option>
+                          <option value="today">Сегодня</option>
+                          <option value="tomorrow">Завтра</option>
+                          <option value="week">Эта неделя</option>
+                          <option value="month">Этот месяц</option>
+                          <option value="next-month">След. месяц</option>
+                        </select>
+                        
+                        <!-- Фильтр по разделу -->
+                        <select class="form-select form-select-sm" style="width: 180px;">
+                          <option value="">Все разделы</option>
+                          <option value="business">Бизнес мероприятия</option>
+                          <option value="family">Клуб молодых семей</option>
+                        </select>
+                        
+                        <!-- Фильтр по статусу -->
+                        <select class="form-select form-select-sm" style="width: 130px;">
+                          <option value="">Все статусы</option>
+                          <option value="active">Активные</option>
+                          <option value="cancelled">Отмененные</option>
+                          <option value="completed">Завершенные</option>
+                        </select>
+                        
+                        <!-- Фильтр платно/бесплатно -->
+                        <select class="form-select form-select-sm" style="width: 140px;">
+                          <option value="">Все мероприятия</option>
+                          <option value="free">Бесплатные</option>
+                          <option value="paid">Платные</option>
+                        </select>
+                        
+                        <!-- Кнопка создания мероприятия -->
+                        <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                          <i class="bi bi-plus-lg"></i> Создать
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body p-0">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Название</th>
+                          <th>Дата</th>
+                          <th>Раздел</th>
+                          <th>Статус</th>
+                          <th>Стоимость</th>
+                          <th style="width: 100px">Действия</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% if events %}
+                        {% for event in events %}
+                        <tr class="align-middle">
+                          <td>{{ event.title }}</td>
+                          <td>{{ event.start_datetime.strftime("%d.%m.%Y %H:%M") }}</td>
+                          <td>
+                            {% if event.section == "business" %}
+                              <span class="badge text-bg-warning">Бизнес мероприятие</span>
+                            {% elif event.section == "family" %}
+                              <span class="badge text-bg-primary">Клуб молодых семей</span>
+                            {% else %}
+                              <span class="badge text-bg-secondary">—</span>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if event.status == "active" %}
+                              <span class="badge text-bg-success">Активно</span>
+                            {% elif event.status == "cancelled" %}
+                              <span class="badge text-bg-secondary">Отменено</span>
+                            {% elif event.status == "completed" %}
+                              <span class="badge text-bg-info">Завершено</span>
+                            {% else %}
+                              <span class="badge text-bg-light text-body">{{ event.status }}</span>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if event.price == 0 %}
+                              Бесплатно
+                            {% else %}
+                              {{ "%.0f"|format(event.price) }} ₽
+                            {% endif %}
+                          </td>
+                          <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" title="Редактировать" disabled>
+                              <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Удалить" disabled>
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                          <td colspan="6" class="text-center text-muted py-4">
+                            Мероприятий пока нет.
+                          </td>
+                        </tr>
+                        {% endif %}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="card-footer clearfix">
+                    <ul class="pagination pagination-sm m-0 float-end">
+                      <li class="page-item {{ 'disabled' if page <= 0 else '' }}">
+                        <a
+                          class="page-link"
+                          href="{{ '/admin/events?page=' ~ (page - 1) ~ '&size=' ~ size if page > 0 else '#' }}"
+                        >&laquo;</a>
+                      </li>
+
+                      <li class="page-item disabled">
+                        <span class="page-link">
+                          Страница {{ page + 1 }} из {{ total_pages }}
+                        </span>
+                      </li>
+
+                      <li class="page-item {{ 'disabled' if (page + 1) >= total_pages else '' }}">
+                        <a
+                          class="page-link"
+                          href="{{ '/admin/events?page=' ~ (page + 1) ~ '&size=' ~ size if (page + 1) < total_pages else '#' }}"
+                        >&raquo;</a>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+              </div>
+            </div>
+            <!-- /.row (main row) -->
+          </div>
+          <!--end::Container-->
+        </div>
+        <!--end::App Content-->
+      </main>
+      <!--end::App Main-->
+    </div>
+    <!--end::App Wrapper-->
+
+    <!--begin::Create Event Modal-->
+    <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <form id="create-event-form">
+            <div class="modal-header">
+              <h5 class="modal-title" id="createEventModalLabel">Создать мероприятие</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+              <div class="mb-3">
+                <label class="form-label">Название</label>
+                <input type="text" name="title" class="form-control" required />
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Дата начала</label>
+                  <input type="date" name="start_date" class="form-control" required lang="ru" />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Время начала</label>
+                  <input type="time" name="start_time" class="form-control" required step="60" lang="ru" />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Часовой пояс</label>
+                  <select name="timezone" class="form-select" required>
+                    <option value="Europe/Moscow" selected>Europe/Moscow (UTC+3)</option>
+                    <option value="Europe/Samara">Europe/Samara (UTC+4)</option>
+                    <option value="Asia/Yekaterinburg">Asia/Yekaterinburg (UTC+5)</option>
+                    <option value="Asia/Omsk">Asia/Omsk (UTC+6)</option>
+                    <option value="Asia/Krasnoyarsk">Asia/Krasnoyarsk (UTC+7)</option>
+                    <option value="Asia/Irkutsk">Asia/Irkutsk (UTC+8)</option>
+                    <option value="Asia/Yakutsk">Asia/Yakutsk (UTC+9)</option>
+                    <option value="Asia/Vladivostok">Asia/Vladivostok (UTC+10)</option>
+                    <option value="Asia/Magadan">Asia/Magadan (UTC+11)</option>
+                    <option value="Asia/Kamchatka">Asia/Kamchatka (UTC+12)</option>
+                    <option value="UTC">UTC</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Раздел</label>
+                  <select name="section" class="form-select" required>
+                    <option value="family" selected>Клуб молодых семей (КМС)</option>
+                    <option value="business">Бизнес мероприятия</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Место проведения</label>
+                <input type="text" name="location" class="form-control" required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Описание</label>
+                <textarea name="description" class="form-control" rows="3" required></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Условия участия</label>
+                <textarea name="participation_conditions" class="form-control" rows="3" required></textarea>
+              </div>
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Стоимость участия (0 — бесплатно)</label>
+                  <input type="number" name="price" class="form-control" min="0" step="1" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Макс. участников</label>
+                  <input type="number" name="max_participants" class="form-control" min="1" step="1" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Статус</label>
+                  <select name="status" class="form-select">
+                    <option value="active" selected>Активно</option>
+                    <option value="cancelled">Отменено</option>
+                    <option value="completed">Завершено</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+              <button type="submit" class="btn btn-primary">Создать</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!--end::Create Event Modal-->
+    <!--begin::Script-->
+    <!--begin::Third Party Plugin(OverlayScrollbars)-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
+    <script src="{{ url_for('static', path='js/adminlte.js') }}"></script>
+    <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
+    <script>
+      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+      const Default = {
+        scrollbarTheme: 'os-theme-light',
+        scrollbarAutoHide: 'leave',
+        scrollbarClickScroll: true,
+      };
+      document.addEventListener('DOMContentLoaded', function () {
+        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+        if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
+          OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+            scrollbars: {
+              theme: Default.scrollbarTheme,
+              autoHide: Default.scrollbarAutoHide,
+              clickScroll: Default.scrollbarClickScroll,
+            },
+          });
+        }
+      });
+    </script>
+    <!--end::OverlayScrollbars Configure-->
+    <!-- apexcharts -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
+      integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
+      crossorigin="anonymous"
+    ></script>
+    <!-- jsvectormap -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"
+      integrity="sha256-/t1nN2956BT869E6H4V1dnt0X5pAQHPytli+1nTZm2Y="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"
+      integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY="
+      crossorigin="anonymous"
+    ></script>
+    <!-- jsvectormap -->
+    <!--end::Script-->
+
+    <script>
+      // Отправка формы создания мероприятия через API /api/events
+      document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('create-event-form');
+        if (!form) return;
+
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(form);
+          const startDate = formData.get('start_date');
+          const startTime = formData.get('start_time');
+          // Важно: НЕ используем toISOString(), иначе браузер переведет время в UTC и вернется смещение.
+          // Отправляем "локальное" значение без указания таймзоны, чтобы сервер сохранил дату/время как есть.
+          const isoStart = startDate && startTime ? `${startDate}T${startTime}:00` : null;
+
+          const payload = {
+            title: formData.get('title'),
+            description: formData.get('description'),
+            participation_conditions: formData.get('participation_conditions'),
+            location: formData.get('location'),
+            start_datetime: isoStart,
+            timezone: formData.get('timezone'),
+            section: formData.get('section'),
+            price: Number(formData.get('price')),
+            max_participants: Number(formData.get('max_participants')),
+            status: formData.get('status') || 'active',
+          };
+
+          const resp = await fetch('/api/events', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+          });
+
+          if (resp.ok) {
+            window.location.reload();
+          } else {
+            alert('Ошибка при создании мероприятия');
+          }
+        });
+      });
+    </script>
+  </body>
+  <!--end::Body-->
+</html>
