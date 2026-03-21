@@ -43,6 +43,19 @@ class EventResponse(EventBase):
     participants: int
 
 
+class EventUpdate(BaseModel):
+    title: Optional[str] = None
+    section: Optional[str] = None
+    description: Optional[str] = None
+    participation_conditions: Optional[str] = None
+    location: Optional[str] = None
+    start_datetime: Optional[datetime] = None
+    timezone: Optional[str] = None
+    price: Optional[float] = None
+    max_participants: Optional[int] = None
+    status: Optional[str] = None
+
+
 class PermissionEnum(str, Enum):
     VIEWER = "viewer"
     EDITOR = "editor"

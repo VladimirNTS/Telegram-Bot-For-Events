@@ -1,11 +1,16 @@
 from uuid import UUID
-from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api_router.schemas import EventBase, EventResponse, Response
+from app.api_router.schemas import EventBase, EventResponse, EventUpdate, Response
 from app.database.engine import get_async_session
-from app.database.queries.events import orm_add_event, orm_delete_event, orm_get_event, orm_get_events
+from app.database.queries.events import (
+    orm_add_event,
+    orm_delete_event,
+    orm_get_event,
+    orm_get_events,
+    orm_update_event,
+)
 
 
 event_router = APIRouter(prefix='/events')
@@ -58,6 +63,8 @@ async def get_user(
     session: AsyncSession = Depends(get_async_session)
 ):
     user = await orm_get_event(session, event_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Event not found")
 
     return user
 
@@ -67,17 +74,33 @@ async def delete_user(
     event_id: int,
     session: AsyncSession = Depends(get_async_session)
 ):
-    await orm_delete_event(session, event_id)
+    result = await orm_delete_event(session, event_id)
+    if result["status"] == "not_found":
+        raise HTTPException(status_code=404, detail=result["message"])
 
     return Response(
-        status='success',
+        status=result["status"],
+        comment=result["message"],
     )
 
 
 @event_router.put('/{event_id}')
 async def update_user(
-    event_id: UUID,
+    event_id: int,
+    event_data: EventUpdate,
     session: AsyncSession = Depends(get_async_session)
 ):
-    pass
+    event = await orm_get_event(session, event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    data = event_data.model_dump(exclude_none=True)
+    if "start_datetime" in data and getattr(data["start_datetime"], "tzinfo", None) is not None:
+        data["start_datetime"] = data["start_datetime"].replace(tzinfo=None)
+
+    if not data:
+        return Response(status="success", comment="No changes provided")
+
+    await orm_update_event(session, event_id, data)
+    return Response(status="success", comment="Event updated")
 

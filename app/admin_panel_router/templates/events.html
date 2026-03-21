@@ -315,52 +315,65 @@
                   <div class="card-header">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                       <h3 class="card-title mb-0">Ближайшие мероприятия</h3>
-                      <div class="d-flex flex-wrap align-items-center gap-2">
+                      <form
+                        method="get"
+                        action="/admin/events"
+                        class="d-flex flex-wrap align-items-center gap-2"
+                      >
+                        <input type="hidden" name="size" value="{{ size }}" />
+                        <input type="hidden" name="page" value="0" />
+
                         <!-- Поиск по названию -->
                         <div class="input-group input-group-sm" style="width: 200px;">
-                          <input type="text" class="form-control" placeholder="Поиск по названию...">
-                          <button class="btn btn-outline-secondary" type="button">
+                          <input
+                            type="text"
+                            name="search"
+                            class="form-control"
+                            placeholder="Поиск по названию..."
+                            value="{{ search or '' }}"
+                          />
+                          <button class="btn btn-outline-secondary" type="submit">
                             <i class="bi bi-search"></i>
                           </button>
                         </div>
-                        
+
                         <!-- Фильтр по дате -->
-                        <select class="form-select form-select-sm" style="width: 130px;">
-                          <option value="">Все даты</option>
-                          <option value="today">Сегодня</option>
-                          <option value="tomorrow">Завтра</option>
-                          <option value="week">Эта неделя</option>
-                          <option value="month">Этот месяц</option>
-                          <option value="next-month">След. месяц</option>
+                        <select name="date" class="form-select form-select-sm" style="width: 130px;" onchange="this.form.submit()">
+                          <option value="" {% if not date_filter %}selected{% endif %}>Все даты</option>
+                          <option value="today" {% if date_filter=='today' %}selected{% endif %}>Сегодня</option>
+                          <option value="tomorrow" {% if date_filter=='tomorrow' %}selected{% endif %}>Завтра</option>
+                          <option value="week" {% if date_filter=='week' %}selected{% endif %}>Эта неделя</option>
+                          <option value="month" {% if date_filter=='month' %}selected{% endif %}>Этот месяц</option>
+                          <option value="next-month" {% if date_filter=='next-month' %}selected{% endif %}>След. месяц</option>
                         </select>
-                        
+
                         <!-- Фильтр по разделу -->
-                        <select class="form-select form-select-sm" style="width: 180px;">
-                          <option value="">Все разделы</option>
-                          <option value="business">Бизнес мероприятия</option>
-                          <option value="family">Клуб молодых семей</option>
+                        <select name="section" class="form-select form-select-sm" style="width: 180px;" onchange="this.form.submit()">
+                          <option value="" {% if not section %}selected{% endif %}>Все разделы</option>
+                          <option value="business" {% if section=='business' %}selected{% endif %}>Бизнес мероприятия</option>
+                          <option value="family" {% if section=='family' %}selected{% endif %}>Клуб молодых семей</option>
                         </select>
-                        
+
                         <!-- Фильтр по статусу -->
-                        <select class="form-select form-select-sm" style="width: 130px;">
-                          <option value="">Все статусы</option>
-                          <option value="active">Активные</option>
-                          <option value="cancelled">Отмененные</option>
-                          <option value="completed">Завершенные</option>
+                        <select name="status" class="form-select form-select-sm" style="width: 130px;" onchange="this.form.submit()">
+                          <option value="" {% if not status %}selected{% endif %}>Все статусы</option>
+                          <option value="active" {% if status=='active' %}selected{% endif %}>Активные</option>
+                          <option value="cancelled" {% if status=='cancelled' %}selected{% endif %}>Отмененные</option>
+                          <option value="completed" {% if status=='completed' %}selected{% endif %}>Завершенные</option>
                         </select>
-                        
+
                         <!-- Фильтр платно/бесплатно -->
-                        <select class="form-select form-select-sm" style="width: 140px;">
-                          <option value="">Все мероприятия</option>
-                          <option value="free">Бесплатные</option>
-                          <option value="paid">Платные</option>
+                        <select name="price_filter" class="form-select form-select-sm" style="width: 140px;" onchange="this.form.submit()">
+                          <option value="" {% if not price_filter %}selected{% endif %}>Все мероприятия</option>
+                          <option value="free" {% if price_filter=='free' %}selected{% endif %}>Бесплатные</option>
+                          <option value="paid" {% if price_filter=='paid' %}selected{% endif %}>Платные</option>
                         </select>
-                        
+
                         <!-- Кнопка создания мероприятия -->
                         <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createEventModal">
                           <i class="bi bi-plus-lg"></i> Создать
                         </button>
-                      </div>
+                      </form>
                     </div>
                   </div>
                   <!-- /.card-header -->
@@ -410,10 +423,28 @@
                             {% endif %}
                           </td>
                           <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Редактировать" disabled>
+                            <button
+                              class="btn btn-sm btn-outline-secondary me-1 view-event-btn"
+                              title="Просмотр"
+                              data-event-id="{{ event.id }}"
+                              type="button"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </button>
+                            <button
+                              class="btn btn-sm btn-outline-primary me-1 edit-event-btn"
+                              title="Редактировать"
+                              data-event-id="{{ event.id }}"
+                              type="button"
+                            >
                               <i class="bi bi-pencil"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" title="Удалить" disabled>
+                            <button
+                              class="btn btn-sm btn-outline-danger delete-event-btn"
+                              title="Удалить"
+                              data-event-id="{{ event.id }}"
+                              type="button"
+                            >
                               <i class="bi bi-trash"></i>
                             </button>
                           </td>
@@ -434,7 +465,7 @@
                       <li class="page-item {{ 'disabled' if page <= 0 else '' }}">
                         <a
                           class="page-link"
-                          href="{{ '/admin/events?page=' ~ (page - 1) ~ '&size=' ~ size if page > 0 else '#' }}"
+                          href="{% if page > 0 %}/admin/events?page={{ page - 1 }}&size={{ size }}&search={{ search or '' }}&date={{ date_filter or '' }}&section={{ section or '' }}&status={{ status or '' }}&price_filter={{ price_filter or '' }}{% else %}#{% endif %}"
                         >&laquo;</a>
                       </li>
 
@@ -447,7 +478,7 @@
                       <li class="page-item {{ 'disabled' if (page + 1) >= total_pages else '' }}">
                         <a
                           class="page-link"
-                          href="{{ '/admin/events?page=' ~ (page + 1) ~ '&size=' ~ size if (page + 1) < total_pages else '#' }}"
+                          href="{% if (page + 1) < total_pages %}/admin/events?page={{ page + 1 }}&size={{ size }}&search={{ search or '' }}&date={{ date_filter or '' }}&section={{ section or '' }}&status={{ status or '' }}&price_filter={{ price_filter or '' }}{% else %}#{% endif %}"
                         >&raquo;</a>
                       </li>
                     </ul>
@@ -553,6 +584,138 @@
       </div>
     </div>
     <!--end::Create Event Modal-->
+
+    <!--begin::View Event Modal-->
+    <div class="modal fade" id="viewEventModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Информация о мероприятии</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <dl class="row mb-0">
+              <dt class="col-sm-4">Название</dt>
+              <dd class="col-sm-8" id="view-title">—</dd>
+
+              <dt class="col-sm-4">Раздел</dt>
+              <dd class="col-sm-8" id="view-section">—</dd>
+
+              <dt class="col-sm-4">Дата и время</dt>
+              <dd class="col-sm-8" id="view-datetime">—</dd>
+
+              <dt class="col-sm-4">Часовой пояс</dt>
+              <dd class="col-sm-8" id="view-timezone">—</dd>
+
+              <dt class="col-sm-4">Место</dt>
+              <dd class="col-sm-8" id="view-location">—</dd>
+
+              <dt class="col-sm-4">Стоимость</dt>
+              <dd class="col-sm-8" id="view-price">—</dd>
+
+              <dt class="col-sm-4">Статус</dt>
+              <dd class="col-sm-8" id="view-status">—</dd>
+
+              <dt class="col-sm-4">Описание</dt>
+              <dd class="col-sm-8" id="view-description">—</dd>
+
+              <dt class="col-sm-4">Условия участия</dt>
+              <dd class="col-sm-8" id="view-conditions">—</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--end::View Event Modal-->
+
+    <!--begin::Edit Event Modal-->
+    <div class="modal fade" id="editEventModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <form id="edit-event-form">
+            <input type="hidden" name="id" />
+            <div class="modal-header">
+              <h5 class="modal-title">Редактировать мероприятие</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+              <div class="mb-3">
+                <label class="form-label">Название</label>
+                <input type="text" name="title" class="form-control" required />
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Дата начала</label>
+                  <input type="date" name="start_date" class="form-control" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Время начала</label>
+                  <input type="time" name="start_time" class="form-control" required step="60" />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Часовой пояс</label>
+                  <select name="timezone" class="form-select" required>
+                    <option value="Europe/Moscow">Europe/Moscow (UTC+3)</option>
+                    <option value="Europe/Samara">Europe/Samara (UTC+4)</option>
+                    <option value="Asia/Yekaterinburg">Asia/Yekaterinburg (UTC+5)</option>
+                    <option value="Asia/Omsk">Asia/Omsk (UTC+6)</option>
+                    <option value="Asia/Krasnoyarsk">Asia/Krasnoyarsk (UTC+7)</option>
+                    <option value="Asia/Irkutsk">Asia/Irkutsk (UTC+8)</option>
+                    <option value="Asia/Yakutsk">Asia/Yakutsk (UTC+9)</option>
+                    <option value="Asia/Vladivostok">Asia/Vladivostok (UTC+10)</option>
+                    <option value="Asia/Magadan">Asia/Magadan (UTC+11)</option>
+                    <option value="Asia/Kamchatka">Asia/Kamchatka (UTC+12)</option>
+                    <option value="UTC">UTC</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Раздел</label>
+                  <select name="section" class="form-select" required>
+                    <option value="family">Клуб молодых семей (КМС)</option>
+                    <option value="business">Бизнес мероприятия</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Место проведения</label>
+                <input type="text" name="location" class="form-control" required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Описание</label>
+                <textarea name="description" class="form-control" rows="3" required></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Условия участия</label>
+                <textarea name="participation_conditions" class="form-control" rows="3" required></textarea>
+              </div>
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Стоимость участия</label>
+                  <input type="number" name="price" class="form-control" min="0" step="1" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Макс. участников</label>
+                  <input type="number" name="max_participants" class="form-control" min="1" step="1" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Статус</label>
+                  <select name="status" class="form-select">
+                    <option value="active">Активно</option>
+                    <option value="cancelled">Отменено</option>
+                    <option value="completed">Завершено</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+              <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!--end::Edit Event Modal-->
     <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
     <script
@@ -655,6 +818,129 @@
           } else {
             alert('Ошибка при создании мероприятия');
           }
+        });
+      });
+    </script>
+
+    <script>
+      function normalizeDateTimeForForm(dtString) {
+        if (!dtString) return { date: '', time: '' };
+        const normalized = dtString.replace(' ', 'T').slice(0, 16);
+        const [date, time] = normalized.split('T');
+        return { date: date || '', time: time || '' };
+      }
+
+      function renderSectionLabel(section) {
+        if (section === 'family') return 'Клуб молодых семей (КМС)';
+        if (section === 'business') return 'Бизнес мероприятия';
+        return '—';
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const viewModal = new bootstrap.Modal(document.getElementById('viewEventModal'));
+        const editModal = new bootstrap.Modal(document.getElementById('editEventModal'));
+
+        document.querySelectorAll('.view-event-btn').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const eventId = btn.dataset.eventId;
+            const resp = await fetch(`/api/events/${eventId}`);
+            if (!resp.ok) {
+              alert('Не удалось загрузить мероприятие');
+              return;
+            }
+            const event = await resp.json();
+
+            document.getElementById('view-title').textContent = event.title || '—';
+            document.getElementById('view-section').textContent = renderSectionLabel(event.section);
+            document.getElementById('view-datetime').textContent = event.start_datetime || '—';
+            document.getElementById('view-timezone').textContent = event.timezone || '—';
+            document.getElementById('view-location').textContent = event.location || '—';
+            document.getElementById('view-price').textContent = Number(event.price) === 0 ? 'Бесплатно' : `${event.price} ₽`;
+            document.getElementById('view-status').textContent = event.status || '—';
+            document.getElementById('view-description').textContent = event.description || '—';
+            document.getElementById('view-conditions').textContent = event.participation_conditions || '—';
+            viewModal.show();
+          });
+        });
+
+        const editForm = document.getElementById('edit-event-form');
+
+        document.querySelectorAll('.edit-event-btn').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const eventId = btn.dataset.eventId;
+            const resp = await fetch(`/api/events/${eventId}`);
+            if (!resp.ok) {
+              alert('Не удалось загрузить мероприятие');
+              return;
+            }
+            const event = await resp.json();
+            const dt = normalizeDateTimeForForm(event.start_datetime);
+
+            editForm.elements.id.value = event.id;
+            editForm.elements.title.value = event.title || '';
+            editForm.elements.start_date.value = dt.date;
+            editForm.elements.start_time.value = dt.time || '12:00';
+            editForm.elements.timezone.value = event.timezone || 'Europe/Moscow';
+            editForm.elements.section.value = event.section || 'business';
+            editForm.elements.location.value = event.location || '';
+            editForm.elements.description.value = event.description || '';
+            editForm.elements.participation_conditions.value = event.participation_conditions || '';
+            editForm.elements.price.value = Number(event.price || 0);
+            editForm.elements.max_participants.value = Number(event.max_participants || 1);
+            editForm.elements.status.value = event.status || 'active';
+
+            editModal.show();
+          });
+        });
+
+        editForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          const id = editForm.elements.id.value;
+          const start_datetime = `${editForm.elements.start_date.value}T${editForm.elements.start_time.value}:00`;
+          const payload = {
+            title: editForm.elements.title.value,
+            section: editForm.elements.section.value,
+            description: editForm.elements.description.value,
+            participation_conditions: editForm.elements.participation_conditions.value,
+            location: editForm.elements.location.value,
+            start_datetime,
+            timezone: editForm.elements.timezone.value,
+            price: Number(editForm.elements.price.value),
+            max_participants: Number(editForm.elements.max_participants.value),
+            status: editForm.elements.status.value,
+          };
+
+          const resp = await fetch(`/api/events/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+
+          if (resp.ok) {
+            window.location.reload();
+          } else {
+            alert('Ошибка при обновлении мероприятия');
+          }
+        });
+
+        document.querySelectorAll('.delete-event-btn').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const eventId = btn.dataset.eventId;
+            if (!confirm('Удалить мероприятие? Для платных событий будет установлено "Отменено".')) {
+              return;
+            }
+
+            const resp = await fetch(`/api/events/${eventId}`, { method: 'DELETE' });
+            const body = await resp.json().catch(() => ({}));
+            if (!resp.ok) {
+              alert(body.detail || 'Ошибка удаления');
+              return;
+            }
+            if (body.comment) {
+              alert(body.comment);
+            }
+            window.location.reload();
+          });
         });
       });
     </script>

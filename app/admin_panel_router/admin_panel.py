@@ -43,13 +43,51 @@ async def get_events_page(
     session: AsyncSession = Depends(get_async_session),
     page: int = Query(0, ge=0, description="Номер страницы (с 0)"),
     size: int = Query(10, ge=1, le=100, description="Количество строк на страницу"),
+    search: str | None = Query(None, alias="search", description="Поиск по названию"),
+    date_filter: str | None = Query(None, alias="date", description="Фильтр по дате"),
+    section: str | None = Query(None, alias="section", description="Фильтр по разделу"),
+    status: str | None = Query(None, alias="status", description="Фильтр по статусу"),
+    price_filter: str | None = Query(None, alias="price_filter", description="Фильтр по цене"),
 ):
     """Страница мероприятий"""
-    from app.database.queries.events import orm_count_events
+    from app.database.queries.events import (
+        orm_count_events,
+        orm_count_events_filtered,
+        orm_get_events_filtered,
+    )
 
-    events = await orm_get_events(session, page, size)
-    total_count = await orm_count_events(session)
-    total_pages = (total_count + size - 1) // size if size else 1
+    # Убираем пустые строки (если пришли из query string)
+    search = search or None
+    date_filter = date_filter or None
+    section = section or None
+    status = status or None
+    price_filter = price_filter or None
+
+    has_any_filter = any([search, date_filter, section, status, price_filter])
+    if has_any_filter:
+        events = await orm_get_events_filtered(
+            session,
+            page=page,
+            size=size,
+            search=search,
+            date_filter=date_filter,
+            section=section,
+            status=status,
+            price_filter=price_filter,
+        )
+        total_count = await orm_count_events_filtered(
+            session,
+            search=search,
+            date_filter=date_filter,
+            section=section,
+            status=status,
+            price_filter=price_filter,
+        )
+    else:
+        events = await orm_get_events(session, page, size)
+        total_count = await orm_count_events(session)
+
+    total_pages = max(1, (total_count + size - 1) // size) if size else 1
 
     return templates.TemplateResponse(
         "events.html",  # Можно создать отдельный шаблон
@@ -62,6 +100,11 @@ async def get_events_page(
             "size": size,
             "total_count": total_count,
             "total_pages": total_pages,
+            "search": search,
+            "date_filter": date_filter,
+            "section": section,
+            "status": status,
+            "price_filter": price_filter,
         }
     )
 

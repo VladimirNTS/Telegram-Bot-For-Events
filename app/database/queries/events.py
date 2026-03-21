@@ -1,8 +1,8 @@
 from typing import Optional
 from sqlalchemy import select, update, delete, and_, or_, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime
-from app.database.models import Event  # импортируйте вашу модель
+from datetime import datetime, timedelta, time
+from app.database.models import Event, Registration  # импортируйте вашу модель
 
 # Добавление события
 async def orm_add_event(
@@ -63,6 +63,144 @@ async def orm_count_events(session: AsyncSession) -> int:
     return int(result.scalar_one())
 
 
+def _get_date_range(date_filter: Optional[str]) -> tuple[datetime, datetime] | None:
+    """Строит диапазон дат по фильтру из UI (локальное время сервера)."""
+    if not date_filter:
+        return None
+
+    now = datetime.now()
+    today = now.date()
+
+    if date_filter == "today":
+        start_dt = datetime.combine(today, time.min)
+        end_dt = datetime.combine(today, time.max)
+        return start_dt, end_dt
+
+    if date_filter == "tomorrow":
+        tomorrow = today + timedelta(days=1)
+        start_dt = datetime.combine(tomorrow, time.min)
+        end_dt = datetime.combine(tomorrow, time.max)
+        return start_dt, end_dt
+
+    if date_filter == "week":
+        start_dt = datetime.combine(today, time.min)
+        end_dt = start_dt + timedelta(days=7) - timedelta(seconds=1)
+        return start_dt, end_dt
+
+    if date_filter == "month":
+        first_day = datetime(now.year, now.month, 1)
+        # первый день следующего месяца
+        if now.month == 12:
+            next_month = datetime(now.year + 1, 1, 1)
+        else:
+            next_month = datetime(now.year, now.month + 1, 1)
+        end_dt = next_month - timedelta(seconds=1)
+        return first_day, end_dt
+
+    if date_filter == "next-month":
+        # вычисляем первый/последний день следующего месяца
+        if now.month == 12:
+            next_month_first = datetime(now.year + 1, 1, 1)
+        else:
+            next_month_first = datetime(now.year, now.month + 1, 1)
+
+        if next_month_first.month == 12:
+            following_month_first = datetime(next_month_first.year + 1, 1, 1)
+        else:
+            following_month_first = datetime(next_month_first.year, next_month_first.month + 1, 1)
+
+        end_dt = following_month_first - timedelta(seconds=1)
+        return next_month_first, end_dt
+
+    return None
+
+
+def _build_event_conditions(
+    *,
+    search: Optional[str] = None,
+    date_filter: Optional[str] = None,
+    section: Optional[str] = None,
+    status: Optional[str] = None,
+    price_filter: Optional[str] = None,
+):
+    conditions = []
+
+    if search:
+        conditions.append(Event.title.ilike(f"%{search}%"))
+
+    date_range = _get_date_range(date_filter)
+    if date_range:
+        start_dt, end_dt = date_range
+        conditions.append(Event.start_datetime >= start_dt)
+        conditions.append(Event.start_datetime <= end_dt)
+
+    if section:
+        conditions.append(Event.section == section)
+
+    if status:
+        conditions.append(Event.status == status)
+
+    if price_filter == "free":
+        conditions.append(Event.price == 0)
+    elif price_filter == "paid":
+        conditions.append(Event.price > 0)
+
+    return conditions
+
+
+async def orm_get_events_filtered(
+    session: AsyncSession,
+    *,
+    page: int,
+    size: int,
+    search: Optional[str] = None,
+    date_filter: Optional[str] = None,
+    section: Optional[str] = None,
+    status: Optional[str] = None,
+    price_filter: Optional[str] = None,
+):
+    conditions = _build_event_conditions(
+        search=search,
+        date_filter=date_filter,
+        section=section,
+        status=status,
+        price_filter=price_filter,
+    )
+
+    query = select(Event)
+    if conditions:
+        query = query.where(and_(*conditions))
+
+    query = query.order_by(Event.start_datetime).offset(page * size).limit(size)
+    result = await session.execute(query)
+    return result.scalars().all()
+
+
+async def orm_count_events_filtered(
+    session: AsyncSession,
+    *,
+    search: Optional[str] = None,
+    date_filter: Optional[str] = None,
+    section: Optional[str] = None,
+    status: Optional[str] = None,
+    price_filter: Optional[str] = None,
+):
+    conditions = _build_event_conditions(
+        search=search,
+        date_filter=date_filter,
+        section=section,
+        status=status,
+        price_filter=price_filter,
+    )
+
+    query = select(func.count()).select_from(Event)
+    if conditions:
+        query = query.where(and_(*conditions))
+
+    result = await session.execute(query)
+    return int(result.scalar_one())
+
+
 # Получение одного события по ID
 async def orm_get_event(session: AsyncSession, event_id: int):
     """
@@ -117,8 +255,9 @@ async def orm_update_event(session: AsyncSession, event_id: int, data: dict):
     start_datetime, timezone, price, max_participants, status
     """
     query = update(Event).where(Event.id == event_id).values(**data)
-    await session.execute(query)
+    result = await session.execute(query)
     await session.commit()
+    return result.rowcount > 0
 
 # Добавление участника на событие
 async def orm_add_participant(session: AsyncSession, event_id: int):
@@ -165,11 +304,31 @@ async def orm_change_event_status(session: AsyncSession, event_id: int, status: 
 # Удаление события
 async def orm_delete_event(session: AsyncSession, event_id: int):
     """
-    Удаление события
+    Безопасное удаление события по ТЗ:
+    - платное мероприятие НЕ удаляем физически, переводим в cancelled
+    - бесплатное удаляем физически
     """
-    query = delete(Event).where(Event.id == event_id)
-    await session.execute(query)
+    event = await orm_get_event(session, event_id)
+    if not event:
+        return {"status": "not_found", "message": "Event not found"}
+
+    # Платные события только отменяем, чтобы сохранить данные для возвратов.
+    if float(event.price) > 0:
+        await orm_change_event_status(session, event_id, "cancelled")
+        return {
+            "status": "cancelled",
+            "message": "Платное мероприятие переведено в статус 'cancelled'. Данные для возвратов сохранены.",
+        }
+
+    # Для бесплатных — удаляем регистрации и само событие.
+    await session.execute(delete(Registration).where(Registration.event_id == event_id))
+    await session.execute(delete(Event).where(Event.id == event_id))
     await session.commit()
+
+    return {
+        "status": "deleted",
+        "message": "Бесплатное мероприятие удалено.",
+    }
 
 # Проверка наличия события
 async def orm_check_event(session: AsyncSession, event_id: int):
